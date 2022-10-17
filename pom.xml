@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.1.3.RELEASE</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>io.linzihao</groupId>
+    <artifactId>nrepl-starter</artifactId>
+    <version>1.0.6-SNAPSHOT</version>
+    <name>nrepl-starter</name>
+    <properties>
+        <java.version>1.8</java.version>
+    </properties>
+
+    <repositories>
+        <repository>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </releases>
+            <url>https://repo.clojars.org</url>
+            <id>clojars</id>
+            <name>Codehaus Snapshots</name>
+            <layout>default</layout>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <!-- https://mvnrepository.com/artifact/luminus-http-kit/luminus-http-kit -->
+        <dependency>
+            <groupId>luminus-http-kit</groupId>
+            <artifactId>luminus-http-kit</artifactId>
+            <version>0.1.9</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.9.1</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.taoensso/sente -->
+        <dependency>
+            <groupId>com.taoensso</groupId>
+            <artifactId>sente</artifactId>
+            <version>1.16.0</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/ring/ring-core -->
+        <dependency>
+            <groupId>ring</groupId>
+            <artifactId>ring-core</artifactId>
+            <version>1.9.5</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/ring/ring-defaults -->
+        <dependency>
+            <groupId>ring</groupId>
+            <artifactId>ring-defaults</artifactId>
+            <version>0.3.3</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/metosin/reitit -->
+        <dependency>
+            <groupId>metosin</groupId>
+            <artifactId>reitit</artifactId>
+            <version>0.5.15</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.clojure/tools.logging -->
+        <dependency>
+            <groupId>org.clojure</groupId>
+            <artifactId>tools.logging</artifactId>
+            <version>1.2.4</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/selmer/selmer -->
+        <dependency>
+            <groupId>selmer</groupId>
+            <artifactId>selmer</artifactId>
+            <version>1.12.50</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/luminus-transit/luminus-transit -->
+        <dependency>
+            <groupId>luminus-transit</groupId>
+            <artifactId>luminus-transit</artifactId>
+            <version>0.1.5</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.cognitect/transit-clj -->
+        <dependency>
+            <groupId>com.cognitect</groupId>
+            <artifactId>transit-clj</artifactId>
+            <version>1.0.329</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.cognitect/transit-cljs -->
+        <dependency>
+            <groupId>com.cognitect</groupId>
+            <artifactId>transit-cljs</artifactId>
+            <version>0.8.269</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/metosin/muuntaja -->
+        <dependency>
+            <groupId>metosin</groupId>
+            <artifactId>muuntaja</artifactId>
+            <version>0.6.8</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/metosin/ring-http-response -->
+        <dependency>
+            <groupId>metosin</groupId>
+            <artifactId>ring-http-response</artifactId>
+            <version>0.9.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.26</version>
+        </dependency>
+        <dependency>
+            <groupId>org.clojure</groupId>
+            <artifactId>clojure</artifactId>
+            <version>1.10.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.clojure</groupId>
+            <artifactId>tools.nrepl</artifactId>
+            <version>0.2.12</version>
+        </dependency>
+        <dependency>
+            <groupId>cider</groupId>
+            <artifactId>cider-nrepl</artifactId>
+            <version>0.18.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/mount/mount -->
+        <dependency>
+            <groupId>mount</groupId>
+            <artifactId>mount</artifactId>
+            <version>0.1.16</version>
+        </dependency>
+        <dependency>
+            <groupId>funcool</groupId>
+            <artifactId>urania</artifactId>
+            <version>0.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>funcool</groupId>
+            <artifactId>promesa</artifactId>
+            <version>8.0.450</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/djblue/portal -->
+        <dependency>
+            <groupId>djblue</groupId>
+            <artifactId>portal</artifactId>
+            <version>0.29.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.clojure</groupId>
+            <artifactId>test.check</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/seancorfield/next.jdbc -->
+        <dependency>
+            <groupId>seancorfield</groupId>
+            <artifactId>next.jdbc</artifactId>
+            <version>1.2.659</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.github.seancorfield/honeysql -->
+        <dependency>
+            <groupId>com.github.seancorfield</groupId>
+            <artifactId>honeysql</artifactId>
+            <version>2.2.891</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.62</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifest>
+                            <mainClass></mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
