@@ -113,6 +113,7 @@ public class R {
             Object result = noArgMethod.invoke(instace, argValues.toArray());
             System.out.println(result);
         } catch (Exception e) {
+            logger.error("Call method Exception", e);
             throw new RuntimeException(e);
         }
     }
