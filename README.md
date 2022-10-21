@@ -9,12 +9,12 @@
 <dependency>
     <groupId>io.linzihao</groupId>
     <artifactId>nrepl-starter</artifactId>
-    <version>1.0.6-SNAPSHOT</version>
+    <version>1.0.7-SNAPSHOT</version>
 </dependency>
 ```
 - gradle
 ```groovy
-implementation 'io.linzihao:nrepl-starter:1.0.6-SNAPSHOT'
+implementation 'io.linzihao:nrepl-starter:1.0.7-SNAPSHOT'
 ```
 
 然后新增配置 start/src/main/resources/application-dev.yml
@@ -57,12 +57,12 @@ https://clojure.org/guides/install_clojure
 <dependency>
     <groupId>io.linzihao</groupId>
     <artifactId>nrepl-starter</artifactId>
-    <version>1.0.6-SNAPSHOT</version>
+    <version>1.0.7-SNAPSHOT</version>
 </dependency>
 ```
 - gradle
 ```groovy
-implementation 'io.linzihao:nrepl-starter:1.0.6-SNAPSHOT'
+implementation 'io.linzihao:nrepl-starter:1.0.7-SNAPSHOT'
 ```
 
 然后新增配置 start/src/main/resources/application-dev.yml
