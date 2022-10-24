@@ -7,14 +7,14 @@
   直接在项目的`pom.xml`里引入依赖
 ```xml
 <dependency>
-    <groupId>io.linzihao</groupId>
+    <groupId>io.github.schneiderlin</groupId>
     <artifactId>nrepl-starter</artifactId>
     <version>1.0.7-SNAPSHOT</version>
 </dependency>
 ```
 - gradle
 ```groovy
-implementation 'io.linzihao:nrepl-starter:1.0.7-SNAPSHOT'
+implementation 'io.github.schneiderlin:nrepl-starter:1.0.7-SNAPSHOT'
 ```
 
 然后新增配置 start/src/main/resources/application-dev.yml
@@ -55,14 +55,14 @@ https://clojure.org/guides/install_clojure
 直接在项目的`pom.xml`里引入依赖
 ```xml
 <dependency>
-    <groupId>io.linzihao</groupId>
+    <groupId>io.github.schneiderlin</groupId>
     <artifactId>nrepl-starter</artifactId>
     <version>1.0.7-SNAPSHOT</version>
 </dependency>
 ```
 - gradle
 ```groovy
-implementation 'io.linzihao:nrepl-starter:1.0.7-SNAPSHOT'
+implementation 'io.github.schneiderlin:nrepl-starter:1.0.7-SNAPSHOT'
 ```
 
 然后新增配置 start/src/main/resources/application-dev.yml
