@@ -1,21 +1,5 @@
 ## 无条件调用项目内方法 节约大量开发时间 提高效率 已有IDEA 插件
 ### 添加依赖
-
-由于目前没上传中央库,所以需要先下载项目,然后对当前项目执行 mvn install, 在本地 maven 仓库中安装
-
-## 第一步:
-
-命令为
-
-git clone https://github.com/schneiderlin/nrepl-starter.git
-
-cd nrepl-starter
-
-mvn install
-
-## 第二步
-
-### 添加依赖
 在需要使用的项目中完成下面操作
 
 - maven
@@ -24,12 +8,12 @@ mvn install
 <dependency>
     <groupId>io.github.schneiderlin</groupId>
     <artifactId>nrepl-starter</artifactId>
-    <version>1.0.7-SNAPSHOT</version>
+    <version>1.0.8</version>
 </dependency>
 ```
 - gradle 记得刷新gradle
 ```groovy
-implementation 'io.github.schneiderlin:nrepl-starter:1.0.7-SNAPSHOT'
+implementation 'io.github.schneiderlin:nrepl-starter:1.0.8'
 ```
 在src/main/resources/application.yml 或者properties文件修改或添加,用以激活application-dev.yml
 ```yaml
