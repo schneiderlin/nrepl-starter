@@ -23,7 +23,6 @@ import java.util.stream.Stream;
 @Service
 @SuppressWarnings({"all"})
 public class R {
-
     private static Logger logger = LoggerFactory.getLogger(R.class);
 
     private static final Var EVAL = var("eval");

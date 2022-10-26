@@ -8,12 +8,12 @@
 <dependency>
     <groupId>io.github.schneiderlin</groupId>
     <artifactId>nrepl-starter</artifactId>
-    <version>1.0.8</version>
+    <version>1.0.9</version>
 </dependency>
 ```
 - gradle 记得刷新gradle
 ```groovy
-implementation 'io.github.schneiderlin:nrepl-starter:1.0.8'
+implementation 'io.github.schneiderlin:nrepl-starter:1.0.9'
 ```
 在src/main/resources/application.yml 或者properties文件修改或添加,用以激活application-dev.yml
 ```yaml

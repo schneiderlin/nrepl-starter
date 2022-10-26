@@ -22,10 +22,13 @@
 
     <groupId>io.github.schneiderlin</groupId>
     <artifactId>nrepl-starter</artifactId>
-    <version>1.0.8</version>
+    <version>1.0.9</version>
     <name>nrepl-starter</name>
     <properties>
-        <java.version>11</java.version>
+        <java.version>8</java.version>
+        <maven.compiler.release>8</maven.compiler.release>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
     </properties>
 
     <repositories>
