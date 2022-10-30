@@ -1,13 +1,9 @@
 package repl;
 
-import clojure.lang.Obj;
 import clojure.lang.RT;
 import clojure.lang.Var;
 import com.alibaba.fastjson.JSON;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -16,10 +12,7 @@ import org.springframework.stereotype.Service;
 import repl.config.StarterServiceProperties;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -113,7 +106,13 @@ public class R {
                         .mapToObj(i -> {
                             String argName = argNames.get(i);
                             Class argClass = argClasses.get(i);
-                            return gson.fromJson(args.get(argName), argClass);
+                            JsonElement arg = args.get(argName);
+                            Optional<String> varOpt = getVar(arg);
+                            if (varOpt.isPresent()) {
+                                return vars.get(varOpt.get());
+                            } else {
+                                return gson.fromJson(arg, argClass);
+                            }
                         });
             }
 
@@ -123,6 +122,20 @@ public class R {
             logger.error("Call method Exception", e);
             throw new RuntimeException(e);
         }
+    }
+
+    private static Optional<String> getVar(JsonElement arg) {
+        if (arg.isJsonPrimitive()) {
+            JsonPrimitive argPrimitive = arg.getAsJsonPrimitive();
+            if (argPrimitive.isString()) {
+                String argString = argPrimitive.getAsString();
+                if (argString.startsWith("$")) {
+                    return Optional.of(argString.substring(1, argString.length()));
+                }
+            }
+        }
+
+        return Optional.empty();
     }
 
     private static <T> T eval(String... code) {
