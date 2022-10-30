@@ -1,5 +1,6 @@
 package repl;
 
+import clojure.lang.Obj;
 import clojure.lang.RT;
 import clojure.lang.Var;
 import com.alibaba.fastjson.JSON;
@@ -16,7 +17,9 @@ import repl.config.StarterServiceProperties;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -28,8 +31,9 @@ public class R {
     private static final Var EVAL = var("eval");
     private static final Var READ_STRING = var("read-string");
 
+    private static final Map<String, Object> vars = new HashMap<>();
+
     public static ApplicationContext applicationContext;
-    public static Object tmp;
 
     private StarterServiceProperties starterServiceProperties;
     private Environment environment;
@@ -89,10 +93,14 @@ public class R {
         replThread.start();
     }
 
+    public static void setVar(String varName, Object value) {
+        vars.put(varName, value);
+    }
+
     public static void callMethod(Object instace, String methodName, List<String> argNames, List<Class> argClasses, String json) {
         try {
-            Method noArgMethod = instace.getClass().getMethod(methodName, argClasses.toArray(new Class[0]));
-
+            Method method = instace.getClass().getDeclaredMethod(methodName, argClasses.toArray(new Class[0]));
+            method.setAccessible(true);
             Gson gson = new Gson();
 
             Stream<Object> argValues;
@@ -109,8 +117,8 @@ public class R {
                         });
             }
 
-            Object result = noArgMethod.invoke(instace, argValues.toArray());
-            System.out.println(result);
+            Object result = method.invoke(instace, argValues.toArray());
+            logger.info("Call method Result {}", result);
         } catch (Exception e) {
             logger.error("Call method Exception", e);
             throw new RuntimeException(e);
