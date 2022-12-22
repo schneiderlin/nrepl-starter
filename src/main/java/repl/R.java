@@ -92,7 +92,8 @@ public class R {
 
     public static void callMethod(Object instace, String methodName, List<String> argNames, List<Class> argClasses, String json) {
         try {
-            Method method = instace.getClass().getDeclaredMethod(methodName, argClasses.toArray(new Class[0]));
+            Class<?> targetClass = AopUtils.isAopProxy(instace) ? AopUtils.getTargetClass(instace) : instace.getClass();
+            Method method = targetClass.getDeclaredMethod(methodName, argClasses.toArray(new Class[0]));
             method.setAccessible(true);
             Gson gson = new Gson();
 
