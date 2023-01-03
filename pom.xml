@@ -22,7 +22,7 @@
 
     <groupId>io.github.schneiderlin</groupId>
     <artifactId>nrepl-starter</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.0-SNAPSHOT</version>
     <name>nrepl-starter</name>
     <properties>
         <java.version>8</java.version>
@@ -45,6 +45,12 @@
     </repositories>
 
     <dependencies>
+        <dependency>
+            <groupId>com.wsscode</groupId>
+            <artifactId>pathom3</artifactId>
+            <version>2022.10.19-alpha</version>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/luminus-http-kit/luminus-http-kit -->
         <dependency>
             <groupId>luminus-http-kit</groupId>
