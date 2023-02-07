@@ -58,6 +58,21 @@
             <version>0.1.9</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/io.github.nextjournal/clerk -->
+        <dependency>
+            <groupId>io.github.nextjournal</groupId>
+            <artifactId>clerk</artifactId>
+            <version>0.12.707</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.taoensso/nippy -->
+        <dependency>
+            <groupId>com.taoensso</groupId>
+            <artifactId>nippy</artifactId>
+            <version>3.2.0</version>
+        </dependency>
+
+        <!--       gson -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
