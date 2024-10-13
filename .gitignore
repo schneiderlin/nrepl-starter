@@ -26,3 +26,5 @@ mvnw.cmd
 /nbdist/
 /.nb-gradle/
 /build/
+
+.clj-kondo/.cache/

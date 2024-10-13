@@ -71,16 +71,17 @@ public class R {
         if (starterServiceProperties.getState() && runMode) {
             start(starterServiceProperties.getPort());
         } else {
-            logger.info("Clojure nrepl service is Loaded,but not start");
+            logger.info("Clojure nrepl service is Loaded, but not start");
             logger.info("Clojure nrepl service running only on {} mode", mode);
         }
     }
 
     public void start(int port) {
         Thread replThread = new Thread(() -> {
-            eval("(use '[clojure.tools.nrepl.server :only (start-server)])");
-            eval("(use '[cider.nrepl :only (cider-nrepl-handler)])");
+            eval("(require '[nrepl.server :refer [start-server]])");
+            eval("(require '[cider.nrepl :refer (cider-nrepl-handler)])");
             eval("(def repl-server (start-server :port " + port + " :handler cider-nrepl-handler))");
+
             logger.info("Clojure nrepl is started on port(s): {} ", port);
         });
         replThread.setName("Nrepl-Service");
