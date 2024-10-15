@@ -28,3 +28,4 @@ mvnw.cmd
 /build/
 
 .clj-kondo/.cache/
+.calva
