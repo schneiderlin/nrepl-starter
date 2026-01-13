@@ -1,7 +1,7 @@
 package com.example;
 
-import repl.R;
-import repl.config.StarterServiceProperties;
+// import repl.R;
+// import repl.config.StarterServiceProperties;
 
 /**
  * Hello world!

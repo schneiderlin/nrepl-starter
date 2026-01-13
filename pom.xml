@@ -174,14 +174,6 @@
                                     </excludes>
                                 </filter>
                             </filters>
-                            <artifactSet>
-                                <includes>
-                                    <include>${project.groupId}:${project.artifactId}:*</include>
-                                    <include>org.clojure:clojure:*</include>
-                                    <include>nrepl:nrepl:*</include>
-                                    <include>cider:cider-nrepl:*</include>
-                                </includes>
-                            </artifactSet>
                         </configuration>
                     </execution>
                 </executions>
