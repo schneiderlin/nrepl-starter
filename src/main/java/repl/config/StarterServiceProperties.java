@@ -1,11 +1,9 @@
 package repl.config;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.Arrays;
 import java.util.List;
 
-@ConfigurationProperties(prefix = "clojure.nrepl")
 public class StarterServiceProperties {
     private boolean state = true;
     private Integer port = 7888;

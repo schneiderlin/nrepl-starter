@@ -1,4 +1,4 @@
-/target/
+**/target/
 !.mvn/wrapper/maven-wrapper.jar
 
 ### STS ###
@@ -29,3 +29,4 @@ mvnw.cmd
 
 .clj-kondo/.cache/
 .calva
+.lsp
