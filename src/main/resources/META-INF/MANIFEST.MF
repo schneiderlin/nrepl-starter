@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Premain-Class: repl.agent.NreplAgent
+Agent-Class: repl.agent.NreplAgent
+Can-Redefine-Classes: true
+Can-Retransform-Classes: true
+
