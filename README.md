@@ -1,8 +1,4 @@
 ## 2.0 版本
-这个项目目前最大的问题是, 有一些 clojure 的 lib, 想要在 jack-in 之后可以使用. 所以把这些 lib 都作为 dependency 引入了. 可能有安全问题, 并且给使用的系统带来了很多不必要的lib.
-理想的情况应该是 jack in 的人只有用到 clojure 某些 lib 的时候, 再自己引入.
-clojure 1.12 版本之后已经有了动态添加 classpath 的方案. 所以理论上升级到 1.12 之后, 就可以把各种 lib 删掉了.
-
 
 > 我的同事 lgp 哥接手维护了这个项目. https://github.com/lgp547/any-door-plugin. 核心功能(idea方法调用)没有区别, anydoor 的更新和维护更频繁, 使用体验更流畅, 建议使用 anydoor.   
 本项目会继续维护, 更专注于 clojure nrepl 的使用场景而不是 idea 插件
@@ -25,6 +21,33 @@ clojure 1.12 版本之后已经有了动态添加 classpath 的方案. 所以理
 - gradle 记得刷新gradle
 ```groovy
 implementation 'io.github.schneiderlin:nrepl-starter:1.0.9'
+```
+
+### main 函数中使用
+```java
+ public static void main(String[] args) {
+    // ----------- 添加 nrepl server --------------------
+    R r = new R(new StarterServiceProperties());
+    Thread replThread = r.start(7888);
+    System.out.println("Hello World!");
+
+    Thread workerThread = new Thread(() -> {
+        // This thread will run indefinitely or until its task is complete
+        while (true) {
+            try {
+                Thread.sleep(1000); // Simulate work
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt(); // Restore interrupt status
+                break;
+            }
+        }
+    });
+    workerThread.start();
+        // --------------------------------------------------
+
+
+    // 其他业务代码
+}
 ```
 
 ## 使用 clojure

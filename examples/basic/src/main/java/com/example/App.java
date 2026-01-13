@@ -16,6 +16,7 @@ public class App {
     }
 
     public static void main(String[] args) {
+        // ----------- 添加 nrepl server --------------------
         R r = new R(new StarterServiceProperties());
         Thread replThread = r.start(7888);
         System.out.println("Hello World!");
@@ -32,5 +33,9 @@ public class App {
             }
         });
         workerThread.start();
+         // --------------------------------------------------
+
+
+        // 其他业务代码
     }
 }
