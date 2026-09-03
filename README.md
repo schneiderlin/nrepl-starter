@@ -59,6 +59,32 @@
 ```
 
 
+## JVM 实时内省: repl.inspect
+
+`repl.inspect` 与 `repl.tools` 一起自动加载。所有函数返回纯 EDN 数据
+（map/vector），可以直接在 nrepl 客户端里看，也是未来 dashboard 前端的数据源。
+
+```clojure
+(repl.inspect/memory)      ;; heap / non-heap / 各 memory pool 用量
+(repl.inspect/gc)          ;; 各 GC collector 的回收次数与耗时
+(repl.inspect/threads)     ;; 线程数、daemon 数、死锁检测
+(repl.inspect/thread-dump) ;; 全部线程 + 堆栈（大应用上会很大）
+(repl.inspect/runtime)     ;; VM 版本、启动参数、uptime
+(repl.inspect/system)      ;; OS、CPU load、物理内存
+
+;; 以下需要 -javaagent（走 Instrumentation）
+(repl.inspect/class-stats)                        ;; 已加载 class 总数
+(repl.inspect/search-classes "^com.example")      ;; 正则搜已加载 class
+(repl.inspect/class-detail "com.example.App")     ;; 方法/字段/classloader 详情
+(repl.inspect/object-size some-obj)               ;; 对象浅大小(字节)
+(repl.inspect/heap-dump! "/tmp/dump.hprof")       ;; 堆 dump（默认只留存活对象）
+
+;; dashboard 用：一次拿全部
+(repl.inspect/snapshot)
+;; => {:at ... :memory {...} :gc [...] :threads {...} :system {...}
+;;     :uptime-ms ... :classes {:loaded-count 8285}}
+```
+
 ## 调用项目内方法 节约大量开发时间 提高效率 已有IDEA 插件
 
 ### 添加依赖

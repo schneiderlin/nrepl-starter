@@ -60,3 +60,6 @@
       (println (eval* client "(count (repl.tools/find-loaded-classes \"com.example.App\"))")))))
 
 (-main)
+;; nrepl client threads are non-daemon; exit explicitly
+(shutdown-agents)
+(System/exit 0)
