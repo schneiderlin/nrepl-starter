@@ -28,4 +28,12 @@
   ;; hot-swap method bodies of an already-loaded class (requires -javaagent)
   (repl.tools/redefine-file! "com.example.App" "src/main/java/com/example/App.java")
   (App/add 3 4)
+
+  ;; --- repl.inspect: live JVM introspection ---
+
+  (repl.inspect/snapshot)                        ;; memory + gc + threads + system in one call
+  (repl.inspect/thread-dump)                     ;; all threads with stacks
+  (repl.inspect/search-classes "^com.example")   ;; regex over loaded classes (needs -javaagent)
+  (repl.inspect/object-size app)                 ;; shallow size in bytes (needs -javaagent)
+  (repl.inspect/heap-dump! "/tmp/app.hprof")     ;; heap dump for offline analysis
   :rcf)

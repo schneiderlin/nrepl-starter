@@ -37,10 +37,10 @@ public class R {
             eval("(require '[cider.nrepl :refer (cider-nrepl-handler)])");
             eval("(def repl-server (start-server :port " + port + " :handler cider-nrepl-handler))");
             try {
-                eval("(require 'repl.tools)");
-                System.out.println("[nrepl-starter] repl.tools loaded: compile-and-load!, redefine! available over nrepl");
+                eval("(require 'repl.tools 'repl.inspect)");
+                System.out.println("[nrepl-starter] repl.tools + repl.inspect loaded: compile-and-load!, redefine!, memory, thread-dump, ... available over nrepl");
             } catch (Throwable t) {
-                System.err.println("[nrepl-starter] failed to load repl.tools: " + t);
+                System.err.println("[nrepl-starter] failed to load repl.tools/repl.inspect: " + t);
             }
         });
         replThread.setName("Nrepl-Service");
