@@ -3,6 +3,61 @@
 > 我的同事 lgp 哥接手维护了这个项目. https://github.com/lgp547/any-door-plugin. 核心功能(idea方法调用)没有区别, anydoor 的更新和维护更频繁, 使用体验更流畅, 建议使用 anydoor.   
 本项目会继续维护, 更专注于 clojure nrepl 的使用场景而不是 idea 插件
 
+## 运行时热更新: repl.tools
+
+启动 nrepl server 后会自动加载 `repl.tools` 命名空间（以资源形式打在 jar 里），
+任何 nrepl 客户端（Calva / agent / 脚本）都可以直接调用，在**运行中的 JVM** 里
+编译、加载、热替换 Java 代码。
+
+### 写一个新 class, 即时编译加载
+
+```clojure
+(repl.tools/compile-and-load!
+  "com.example.Greeter"
+  "package com.example;
+   public class Greeter {
+     public static String greet(String name) { return \"hello \" + name; }
+   }")
+;; => {:ok? true :class com.example.Greeter :loaded [...] :diagnostics []}
+```
+
+- 编译在内存中完成（`javax.tools.JavaCompiler`），不落盘；要求目标进程用 JDK 启动而不是 JRE
+- 每次调用使用一个**全新的** classloader，所以同名 class 可以反复重载，返回的 `:class` 永远是最新定义
+- 编译 classpath 默认取目标应用的 `java.class.path`；也可传 `:classpath`
+
+### 改已有 class 的源码 (JVM HotSwap)
+
+```clojure
+(repl.tools/redefine!
+  "com.example.App"
+  "package com.example;
+   public class App {
+     public static int add(int a, int b) { return a * b; }  // 方法体从 + 改成 *
+     ...
+   }")
+;; => {:ok? true :redefined 1}
+
+(com.example.App/add 3 4)  ;; => 12
+```
+
+- 通过 `Instrumentation/redefineClasses` 实现，要求用 `-javaagent` 方式启动（手动 `R.start` 没有 Instrumentation 句柄）
+- **JVM 限制：只允许 schema 不变的修改**（方法体、常量）。加/删方法、字段会返回错误和提示；这种场景请写新 class 用 `compile-and-load!`
+- 同一个 class 被多个 classloader 加载时会全部 redefine
+
+### 文件便利函数
+
+```clojure
+(repl.tools/redefine-file! "com.example.App" "src/main/java/com/example/App.java")
+(repl.tools/compile-and-load-file! "com.example.Greeter" "scratch/Greeter.java")
+```
+
+### 内省
+
+```clojure
+(repl.tools/find-loaded-classes "com.example.App")  ;; 已加载的同名 Class（按 classloader 区分）
+(repl.tools/instrumentation)                        ;; 原始 Instrumentation 句柄
+```
+
 
 ## 调用项目内方法 节约大量开发时间 提高效率 已有IDEA 插件
 
