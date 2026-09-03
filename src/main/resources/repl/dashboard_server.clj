@@ -2,7 +2,8 @@
   "Server-only helpers for the Electric dashboard. Runs inside the target JVM;
    never compiled to CLJS. Kept separate from dashboard.main so the Electric
    compiler only sees plain clj vars in e/server positions."
-  (:require [repl.inspect :as inspect]))
+  (:require [repl.inspect :as inspect]
+            [repl.invoke :as invoke]))
 
 ;;; ---------------------------------------------------------------------------
 ;;; live snapshot source (1 Hz)
@@ -32,6 +33,21 @@
   [q limit]
   (try {:ok (inspect/search-classes q limit)}
        (catch Throwable t {:err (str t)})))
+
+;;; ---------------------------------------------------------------------------
+;;; method invocation (repl.invoke wrappers; Electric code cannot contain try)
+
+(defn list-methods-safe [class-name]
+  (try {:ok (invoke/list-methods class-name)}
+       (catch Throwable t {:err (str t)})))
+
+(defn shelf-instances-safe [class-name]
+  (try {:ok (invoke/shelf-instances class-name)}
+       (catch Throwable t {:err (str t)})))
+
+(defn invoke-safe [req]
+  (try (invoke/invoke! req)
+       (catch Throwable t {:ok? false :error (str t)})))
 
 (defn eval-string
   "Eval Clojure code in the `user` namespace of the target JVM."

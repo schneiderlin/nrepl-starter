@@ -37,6 +37,37 @@ cd .. && mvn clean package  # 重新打 agent jar
 > 许可注意：Electric v3 是 BSL（Business Source License）许可——非商业使用免费，
 > 商业使用需确认符合其条款。
 
+## 方法调用: repl.invoke (浏览器版 anydoor)
+
+dashboard 上的 **INVOKE METHOD** 卡片：搜类 → 选方法/构造器 → 按行填 EDN 参数 → 调用。
+同一套逻辑在 `repl.invoke` 命名空间，nrepl 里也能直接用：
+
+```clojure
+(repl.invoke/list-methods "com.example.App")
+;; => {:class "com.example.App" :loaders 1
+;;     :entries [{:key "c-0" :kind :ctor :label "new App ()" ...}
+;;               {:key "m-1" :kind :method :static? true :label "static add (int, int) : int" ...}]}
+
+;; 静态方法
+(repl.invoke/invoke! {:class-name "com.example.App" :sel "m-1" :args-text "3\n4"})
+;; => {:ok? true :result 7}
+
+;; 构造器 → 对象自动上 shelf；实例方法用 :target-id 选 shelf 上的对象
+(repl.invoke/invoke! {:class-name "com.example.App" :sel "c-0"})
+;; => {:ok? true :shelf {:id "0" :label "#0 com.example.App@..."}}
+(repl.invoke/invoke! {:class-name "com.example.App" :sel "m-2" :target-id "0" :args-text "10\n3"})
+
+;; EDN map → Java bean (无参构造 + setter)
+(repl.invoke/invoke! {:class-name "com.example.Calc" :sel "m-0" :args-text "{:a 3 :b 4}"})
+```
+
+参数转换：原始类型、String、enum、null，以及 EDN map → bean。结果序列化成
+有界 EDN 数据（嵌套 map/集合/数组，深度 4，每层最多 100 项）。
+
+相关：`repl.tools/compile-and-load!` 编译的类会进入一个共享注册表，后续编译可以
+引用前面编译的类（javac 通过落盘的 .class 目录看到它们，运行时通过 child-first 的
+`repl.BytesClassLoader` 解析到最新字节码）。
+
 ## 运行时热更新: repl.tools
 
 启动 nrepl server 后会自动加载 `repl.tools` 命名空间（以资源形式打在 jar 里），
