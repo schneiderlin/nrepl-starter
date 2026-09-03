@@ -56,7 +56,7 @@
         (check "heap-dump!" (and (:ok? dump) (pos? (:bytes dump))) dump))
 
       (let [snap (eval* client "(keys (repl.inspect/snapshot))")]
-        (check "snapshot" (= #{:at :memory :gc :threads :system :uptime-ms :classes}
+        (check "snapshot" (= #{:at :vm :memory :gc :threads :system :uptime-ms :classes}
                              (set snap))
                snap)))))
 

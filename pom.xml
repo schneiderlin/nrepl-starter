@@ -55,6 +55,26 @@
             <version>0.47.1</version>
         </dependency>
 
+        <!-- dashboard (repl.dashboard): Electric v3 UI over ring/jetty.
+             Requires JDK 17+ at runtime (Jetty 12). -->
+        <dependency>
+            <groupId>com.hyperfiddle</groupId>
+            <artifactId>electric</artifactId>
+            <version>v3-alpha-ca05cbc93</version>
+            <exclusions>
+                <!-- dev-build license login only; unused at runtime/prod builds -->
+                <exclusion>
+                    <groupId>com.auth0</groupId>
+                    <artifactId>java-jwt</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>ring</groupId>
+            <artifactId>ring</artifactId>
+            <version>1.15.3</version>
+        </dependency>
+
     </dependencies>
 
     <build>

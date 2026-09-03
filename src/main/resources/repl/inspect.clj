@@ -170,6 +170,8 @@
    uptime, loaded-class count (when the agent is present)."
   []
   {:at        (System/currentTimeMillis)
+   :vm        (let [r (ManagementFactory/getRuntimeMXBean)]
+                {:name (.getVmName r) :version (.getVmVersion r)})
    :memory    (memory)
    :gc        (gc)
    :threads   (threads)

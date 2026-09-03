@@ -1,0 +1,6 @@
+{:builds
+ {:prod {:target :browser
+         :output-dir "../src/main/resources/public/nrepl_dashboard/js"
+         :asset-path "/nrepl_dashboard/js"
+         :modules {:main {:entries [dashboard.prod] :init-fn dashboard.prod/-main}}
+         :module-hash-names true}}}

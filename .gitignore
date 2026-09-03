@@ -30,3 +30,10 @@ mvnw.cmd
 .clj-kondo/.cache/
 .calva
 .lsp
+# dashboard client build artifacts (rebuilt via `cd dashboard && clj -X:build build-client`)
+src/main/resources/public/nrepl_dashboard/js/
+src/main/resources/electric-manifest.edn
+
+# dashboard build caches
+dashboard/.shadow-cljs/
+dashboard/.cpcache/
