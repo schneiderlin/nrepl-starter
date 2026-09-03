@@ -3,6 +3,40 @@
 > 我的同事 lgp 哥接手维护了这个项目. https://github.com/lgp547/any-door-plugin. 核心功能(idea方法调用)没有区别, anydoor 的更新和维护更频繁, 使用体验更流畅, 建议使用 anydoor.   
 本项目会继续维护, 更专注于 clojure nrepl 的使用场景而不是 idea 插件
 
+## 浏览器 Dashboard (Electric Clojure v3)
+
+在目标 JVM 里内嵌一个 Electric Clojure v3 实时 dashboard（websocket 推送，非轮询）：
+
+- 实时内存（heap / non-heap / 各 pool 的用量条）、GC、线程数、CPU、uptime
+- 已加载 class 正则搜索（类浏览器雏形）
+- 浏览器内 eval console（直接 eval 到目标 JVM 的 `user` ns，能调 `repl.tools` / `repl.inspect` 的全部能力）
+
+启动目标应用后访问 http://127.0.0.1:7890 （仅监听 loopback）。
+
+系统属性配置：
+
+- `-Dnrepl.dashboard.enabled=false` — 关闭 dashboard（默认开启）
+- `-Dnrepl.dashboard.port=7890` — 端口
+- `-Dnrepl.dashboard.host=127.0.0.1` — 监听地址
+
+**运行时要求 JDK 17+**（Jetty 12）。JDK 8 的目标进程会自动跳过 dashboard，nrepl 不受影响。
+
+### 构建 dashboard 前端资源
+
+dashboard 的 CLJS 客户端是**预编译**的（Electric v3 的 client 编译需要 shadow-cljs，
+只在构建期需要，运行时和 prod 构建都不需要 hyperfiddle 许可登录）：
+
+```bash
+cd dashboard
+clj -X:build build-client   # 产物写入 ../src/main/resources/public/nrepl_dashboard/
+cd .. && mvn clean package  # 重新打 agent jar
+```
+
+产物（js + manifest）不入库；jar 里没有这些资源时 dashboard 自动禁用并打印提示。
+
+> 许可注意：Electric v3 是 BSL（Business Source License）许可——非商业使用免费，
+> 商业使用需确认符合其条款。
+
 ## 运行时热更新: repl.tools
 
 启动 nrepl server 后会自动加载 `repl.tools` 命名空间（以资源形式打在 jar 里），

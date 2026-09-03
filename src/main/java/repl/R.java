@@ -42,6 +42,15 @@ public class R {
             } catch (Throwable t) {
                 System.err.println("[nrepl-starter] failed to load repl.tools/repl.inspect: " + t);
             }
+            if (Boolean.parseBoolean(System.getProperty("nrepl.dashboard.enabled", "true"))) {
+                try {
+                    eval("(require 'repl.dashboard)");
+                    eval("(repl.dashboard/start!)");
+                } catch (Throwable t) {
+                    // e.g. dashboard deps excluded, or target JVM < 17 (Jetty 12)
+                    System.err.println("[nrepl-starter] dashboard failed to start: " + t);
+                }
+            }
         });
         replThread.setName("Nrepl-Service");
         replThread.start();
