@@ -15,27 +15,14 @@ public class App {
         return a - b;
     }
 
-    public static void main(String[] args) {
-        // ----------- 添加 nrepl server --------------------
+    public static void main(String[] args) throws InterruptedException {
+        // 手动方式: 不使用 -javaagent 时，取消下面注释自行启动 nrepl
         // R r = new R(new StarterServiceProperties());
         // Thread replThread = r.start(7888);
-        // System.out.println("Hello World!");
 
-        // Thread workerThread = new Thread(() -> {
-        //     // This thread will run indefinitely or until its task is complete
-        //     while (true) {
-        //         try {
-        //             Thread.sleep(1000); // Simulate work
-        //         } catch (InterruptedException e) {
-        //             Thread.currentThread().interrupt(); // Restore interrupt status
-        //             break;
-        //         }
-        //     }
-        // });
-        // workerThread.start();
-         // --------------------------------------------------
+        System.out.println("App running. add(1, 2) = " + add(1, 2));
 
-
-        // 其他业务代码
+        // keep the JVM alive so you can connect over nrepl and hot-swap code
+        Thread.currentThread().join();
     }
 }

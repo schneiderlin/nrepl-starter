@@ -15,14 +15,23 @@ import java.lang.instrument.Instrumentation;
  * - nrepl.enabled: Enable/disable nrepl (default: true)
  */
 public class NreplAgent {
-    
+
+    /**
+     * Instrumentation handle captured at JVM startup. repl.tools reads this to
+     * redefine already-loaded classes and inspect loaded classes / object sizes.
+     * Stays null when nrepl is started manually via R (no -javaagent).
+     */
+    public static volatile Instrumentation instrumentation;
+
     private static volatile Thread replThread;
-    
+
     public static void premain(String agentArgs, Instrumentation inst) {
+        instrumentation = inst;
         startNrepl();
     }
-    
+
     public static void agentmain(String agentArgs, Instrumentation inst) {
+        instrumentation = inst;
         startNrepl();
     }
     

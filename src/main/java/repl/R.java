@@ -29,9 +29,19 @@ public class R {
 
     public Thread start(int port) {
         Thread replThread = new Thread(() -> {
+            // embedded Clojure creates `user` without clojure.core referred;
+            // refer it so nrepl clients land in a normal REPL namespace
+            eval("(clojure.core/binding [clojure.core/*ns* (clojure.core/create-ns (quote user))]"
+                    + " (clojure.core/refer (quote clojure.core)))");
             eval("(require '[nrepl.server :refer [start-server]])");
             eval("(require '[cider.nrepl :refer (cider-nrepl-handler)])");
             eval("(def repl-server (start-server :port " + port + " :handler cider-nrepl-handler))");
+            try {
+                eval("(require 'repl.tools)");
+                System.out.println("[nrepl-starter] repl.tools loaded: compile-and-load!, redefine! available over nrepl");
+            } catch (Throwable t) {
+                System.err.println("[nrepl-starter] failed to load repl.tools: " + t);
+            }
         });
         replThread.setName("Nrepl-Service");
         replThread.start();
