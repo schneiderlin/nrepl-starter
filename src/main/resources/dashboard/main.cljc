@@ -11,7 +11,8 @@
             [hyperfiddle.electric-dom3 :as dom]
             #?@(:clj [[clojure.string :as str]
                       [repl.dashboard-server :as srv]
-                      [repl.inspect :as inspect]])))
+                      [repl.inspect :as inspect]
+                      [repl.invoke :as inv]])))
 
 ;;; ---------------------------------------------------------------------------
 ;;; pieces
@@ -90,6 +91,73 @@
               (dom/text (if (:ok? res) (:value res) (:error res))))))))))
 
 ;;; ---------------------------------------------------------------------------
+;;; method invocation (browser anydoor)
+
+(e/defn InvokeResult [req]
+  (e/client
+    (let [res (e/server (srv/invoke-safe req))]
+      (if (:ok? res)
+        (dom/div
+          (dom/pre (dom/props {:class "mono result"})
+            (dom/text (pr-str (:result res))))
+          (when-some [s (:shelf res)]
+            (dom/div (dom/props {:class "mono"})
+              (dom/text "stored on shelf: " (:label s)))))
+        (dom/pre (dom/props {:class "mono err"})
+          (dom/text (:error res)))))))
+
+(e/defn MethodForm [class-name sel]
+  (e/client
+    (let [entry (e/server (inv/find-entry class-name sel))]
+      (when (some? entry)
+        (dom/div
+          (dom/div (dom/props {:class "mono hint"})
+            (dom/text (if (seq (:param-types entry))
+                        (str "args — one EDN value per line: " (pr-str (:param-types entry)))
+                        "no args")))
+          (let [args-text (dom/textarea (dom/props {:class "mono" :rows "4"
+                                                    :placeholder "one EDN value per line"})
+                            (dom/On "input" (fn [e] (.. e -target -value)) ""))
+                target-id (when (and (= :method (:kind entry)) (not (:static? entry)))
+                            (dom/select (dom/props {:class "mono"})
+                              (dom/option (dom/props {:value ""})
+                                (dom/text "-- target instance (from shelf) --"))
+                              (e/for [t (e/diff-by :id (or (e/server (:ok (srv/shelf-instances-safe class-name))) []))]
+                                (dom/option (dom/props {:value (:id t)}) (dom/text (:label t))))
+                              (dom/On "change" (fn [e] (.. e -target -value)) "")))
+                submitted (dom/button (dom/text "call")
+                            (dom/On "click" (fn [_] {:class-name class-name
+                                                     :sel        sel
+                                                     :args-text  args-text
+                                                     :target-id  target-id})
+                                    nil))]
+            (when (some? submitted)
+              (InvokeResult submitted))))))))
+
+(e/defn MethodInvoker []
+  (e/client
+    (dom/div (dom/props {:class "card"})
+      (dom/h2 (dom/text "invoke method"))
+      (let [q (dom/input (dom/props {:class "mono" :placeholder "class regex — e.g. ^com\\.example"})
+                (dom/On "input" (fn [e] (.. e -target -value)) ""))]
+        (when (e/server (not (str/blank? q)))
+          (let [found (e/server (:ok (srv/search-classes-safe q 50)))
+                class-name (dom/select (dom/props {:class "mono"})
+                             (dom/option (dom/props {:value ""}) (dom/text "-- class --"))
+                             (e/for [c (e/diff-by identity (or found []))]
+                               (dom/option (dom/props {:value c}) (dom/text c)))
+                             (dom/On "change" (fn [e] (.. e -target -value)) ""))]
+            (when (e/server (not (str/blank? class-name)))
+              (let [info (e/server (:ok (srv/list-methods-safe class-name)))
+                    sel (dom/select (dom/props {:class "mono"})
+                          (dom/option (dom/props {:value ""}) (dom/text "-- method / constructor --"))
+                          (e/for [m (e/diff-by :key (:entries info))]
+                            (dom/option (dom/props {:value (:key m)}) (dom/text (:label m))))
+                          (dom/On "change" (fn [e] (.. e -target -value)) ""))]
+                (when (e/server (not (str/blank? sel)))
+                  (MethodForm class-name sel))))))))))
+
+;;; ---------------------------------------------------------------------------
 ;;; entrypoints
 
 (e/defn Main [ring-request]
@@ -103,6 +171,7 @@
                 (MemoryCard (:memory snap))
                 (GcCard (:gc snap)))))
         (ClassSearch)
+        (MethodInvoker)
         (EvalConsole)))))
 
 (defn electric-boot [ring-request]

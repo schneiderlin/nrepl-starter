@@ -22,13 +22,16 @@
   compile-and-load! instead (or restart the module). redefine! requires the
   JVM to have been started with -javaagent; manual R/start has no
   Instrumentation handle."
-  (:require [clojure.string :as str])
-  (:import [clojure.lang DynamicClassLoader RT]
+  (:require [clojure.java.io :as io]
+            [clojure.string :as str])
+  (:import [clojure.lang RT]
            [java.io ByteArrayOutputStream File]
            [java.lang.instrument ClassDefinition Instrumentation]
            [java.net URI URL URLClassLoader]
+           [java.util.concurrent ConcurrentHashMap]
            [javax.tools DiagnosticCollector ForwardingJavaFileManager
-            JavaFileObject$Kind SimpleJavaFileObject ToolProvider]))
+            JavaFileObject$Kind SimpleJavaFileObject ToolProvider]
+           [repl BytesClassLoader]))
 
 ;;; ---------------------------------------------------------------------------
 ;;; in-memory compilation (javax.tools.JavaCompiler, no files touched)
@@ -62,11 +65,38 @@
         (class-output-object class-name class-bytes)
         (proxy-super getJavaFileForOutput location class-name kind sibling)))))
 
+;;; ---------------------------------------------------------------------------
+;;; compiled-class registry — every class we compile is kept here, so later
+;;; compilations can reference earlier agent-compiled classes (javac sees them
+;;; via a flushed .class dir on the classpath; the runtime sees them through
+;;; BytesClassLoader, child-first over the registry)
+
+(defonce ^:private registry ^ConcurrentHashMap (ConcurrentHashMap.))
+
+(defonce ^:private registry-dir
+  (delay
+    (let [dir (io/file (System/getProperty "java.io.tmpdir") "nrepl-starter-compiled")]
+      (.mkdirs dir)
+      dir)))
+
+(defn- flush-registry!
+  "Write registered bytecode to disk so javac can resolve previously
+   compile-and-load!'d classes. Returns the dir path for -classpath."
+  []
+  (let [dir @registry-dir]
+    (doseq [[^String n ^bytes bytes] registry]
+      (let [f (io/file dir (str (str/replace n "." "/") ".class"))]
+        (.mkdirs (.getParentFile f))
+        (with-open [out (io/output-stream f)]
+          (.write out bytes))))
+    (.getAbsolutePath dir)))
+
 (defn- default-classpath []
   (let [loader (.getContextClassLoader (Thread/currentThread))
         urls   (when (instance? URLClassLoader loader)
                  (map #(.getFile ^URL %) (.getURLs ^URLClassLoader loader)))]
-    (->> (cons (System/getProperty "java.class.path") urls)
+    (->> (cons (System/getProperty "java.class.path")
+               (concat urls [(flush-registry!)]))
          (remove str/blank?)
          (str/join File/pathSeparator))))
 
@@ -103,28 +133,33 @@
 (defonce ^:private loader* (atom nil))
 
 (defn- new-loader!
-  "Fresh DynamicClassLoader parented to the app's classloader. Each
-   compile-and-load! gets its own loader, so recompiling the same name
-   shadows the previous definition instead of failing."
+  "Fresh BytesClassLoader (child-first over the shared registry) parented to
+   the app's classloader. Each compile-and-load! gets its own loader, so
+   recompiling re-reads the latest registry bytes and cross-references
+   between agent-compiled classes always resolve to the newest version."
   []
   (reset! loader*
-          (DynamicClassLoader. (or (.getContextClassLoader (Thread/currentThread))
-                                   (RT/baseLoader)))))
+          (BytesClassLoader. (or (.getContextClassLoader (Thread/currentThread))
+                                 (RT/baseLoader))
+                             registry)))
 
 (defn load-class!
-  "Define a class from bytecode in the current dynamic classloader."
+  "Register bytecode and define the class in the current classloader."
   ^Class [^String class-name ^bytes bytes]
-  (.defineClass ^DynamicClassLoader (or @loader* (new-loader!)) class-name bytes nil))
+  (.put registry class-name bytes)
+  (flush-registry!)
+  (.loadClass ^BytesClassLoader (or @loader* (new-loader!)) class-name))
 
 (defn compile-and-load!
-  "Compile `source` and load every generated class (including inner classes)
-   into a FRESH dynamic classloader whose parent is the app's classloader.
+  "Compile `source`, register every generated class (including inner classes)
+   in the shared registry, and load them through a FRESH BytesClassLoader.
 
-   Because each call uses a new loader, calling this again with the same class
-   name shadows the previous definition — the returned :class is the new one.
-   Classes already loaded elsewhere are unaffected; use the returned Class
-   (e.g. via clojure.lang.Reflector or .getMethod/.newInstance) to reach the
-   new definition.
+   Because each call uses a new loader over the latest registry, calling this
+   again with the same class name shadows the previous definition — the
+   returned :class is the new one — and new classes can reference classes from
+   earlier compile-and-load! calls. Classes already loaded elsewhere are
+   unaffected; use the returned Class (e.g. via clojure.lang.Reflector or
+   .getMethod/.newInstance) to reach the new definition.
 
    Returns {:ok? bool :class Class :loaded [names] :diagnostics [strings]}."
   ([class-name source] (compile-and-load! class-name source {}))
@@ -132,13 +167,17 @@
    (let [{:keys [ok? classes diagnostics]} (compile-java class-name source opts)]
      (if-not ok?
        {:ok? false :diagnostics diagnostics}
-       (let [loader  (new-loader!)
-             defined (mapv (fn [[n b]] (.defineClass ^DynamicClassLoader loader ^String n ^bytes b nil))
-                           classes)]
-         {:ok?         true
-          :class       (some #(when (= class-name (.getName ^Class %)) %) defined)
-          :loaded      (mapv #(.getName ^Class %) defined)
-          :diagnostics diagnostics})))))
+       (do
+         (doseq [[^String n ^bytes b] classes]
+           (.put registry n b))
+         (flush-registry!)
+         (let [loader  (new-loader!)
+               defined (mapv (fn [[n _]] (.loadClass ^BytesClassLoader loader ^String n))
+                             classes)]
+           {:ok?         true
+            :class       (some #(when (= class-name (.getName ^Class %)) %) defined)
+            :loaded      (mapv #(.getName ^Class %) defined)
+            :diagnostics diagnostics}))))))
 
 ;;; ---------------------------------------------------------------------------
 ;;; redefining already-loaded classes (JVM HotSwap)
