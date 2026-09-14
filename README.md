@@ -92,6 +92,52 @@ cd .. && mvn clean package  # 重新打 agent jar
 (repl.tools/instrumentation)                        ;; 原始 Instrumentation 句柄
 ```
 
+### Quarkus / 隔离 ClassLoader
+
+Quarkus dev mode、插件容器等环境会把应用类放在独立 classloader 中。先用一个
+已经加载的业务类选择对应 loader，再在该作用域内编译、执行表达式：
+
+```clojure
+;; 查看同名类的所有候选 loader；Quarkus 热重载后可能不止一个
+(repl.tools/classloader-candidates "com.example.App")
+
+;; 默认选择第一个未关闭的非 bootstrap loader
+(repl.tools/classloader-for "com.example.App")
+
+;; 表达式会在目标 loader 中重新编译，因此可以直接引用应用类
+(repl.tools/with-classloader "com.example.App"
+  (com.example.App/status))
+
+;; 多个 live loader 时通过候选 index 精确选择
+(repl.tools/with-classloader ["com.example.App" 1]
+  (com.example.App/status))
+```
+
+`with-classloader` 的 body 会重新编译，不能捕获调用位置的局部变量。需要传入局部值
+或调用普通 Clojure 函数时，使用 `call-with-classloader`：
+
+```clojure
+(let [source "package scratch; public class Probe { /* ... */ }"]
+  (repl.tools/call-with-classloader
+    "com.example.App"
+    #(repl.tools/compile-and-load! "scratch.Probe" source)))
+```
+
+在该作用域内，`compile-and-load!` 会以选中的应用 loader 为父级，并将目标 loader
+可见的 URL 与已加载类 CodeSource 加入默认 JavaCompiler classpath。
+
+个人使用 Quarkus Maven dev mode 时无需修改项目 POM：
+
+```bash
+./mvnw quarkus:dev \
+  -Djvm.args="-javaagent:/absolute/path/nrepl-starter-2.0.0-SNAPSHOT-agent.jar -Dnrepl.dashboard.enabled=false"
+```
+
+`quarkus:dev` 在 forked JVM 中运行应用，所以这里使用 Quarkus 的 `jvm.args`，
+而不是只影响 Maven 进程的 `MAVEN_OPTS`。
+
+Java Agent 仅适用于 JVM 模式，不适用于 Quarkus native executable。
+
 
 ## JVM 实时内省: repl.inspect
 
